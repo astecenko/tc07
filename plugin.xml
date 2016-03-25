@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+<extension
+         point="org.eclipse.ui.commands">
+      <category
+            name="Rostvertol"
+            id="ru.rostvertolplc.osapr.commands.category">
+      </category>
+      <command
+            name="Скопировать все ТП сборки в буфер обмена"
+            categoryId="ru.rostvertolplc.osapr.commands.category"
+            id="ru.rostvertolplc.osapr.tc07.commands.mainCommand">            
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            commandId="ru.rostvertolplc.osapr.tc07.commands.mainCommand"
+            class="ru.rostvertolplc.osapr.tc07.handlers.MainHandler">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="ru.rostvertolplc.osapr.tc07.commands.mainCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            sequence="M1+6"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>
+   </extension>
+   
+   <extension point="org.eclipse.ui.menus">
+
+		<menuContribution locationURI="menu:org.eclipse.ui.main.menu">
+			<menu id="RVT.userMenu" label="Инструменты РВТ">
+				<command commandId="ru.rostvertolplc.osapr.tc07.commands.mainCommand">
+					<visibleWhen>
+						<reference definitionId="com.teamcenter.rac.pse.inMainView" />
+  					</visibleWhen>
+				</command>	       		   
+			</menu> 
+		</menuContribution> 
+    </extension>
+</plugin>
