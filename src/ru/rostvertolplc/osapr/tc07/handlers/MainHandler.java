@@ -28,9 +28,24 @@ public class MainHandler extends AbstractHandler {
 	public MainHandler() {
 	}
 
+	private void AddToClipboard(TCComponentItemRevision rev1)
+			throws TCException {
+		if (rev1 != null) {
+			AIFComponentContext[] where = rev1.whereReferenced();
+			for (AIFComponentContext cont1 : where) {
+				if ((cont1.getComponent().toString().startsWith("TP_"
+						+ rev1.getItem().getProperty("current_id")))
+						&& (!localVector.contains((TCComponent) cont1
+								.getComponent())))
+					localVector.addElement((TCComponent) cont1.getComponent());
+			}
+		}
+	}
+
 	boolean CheckNode(TCComponentBOMLine bomLine1) {
 
 		try {
+			AddToClipboard(bomLine1.getItemRevision());
 			AIFComponentContext[] arrayOfAIFComponentContext = null;
 			try {
 				arrayOfAIFComponentContext = bomLine1.getChildren();
@@ -44,25 +59,7 @@ public class MainHandler extends AbstractHandler {
 				for (int j = 0; j < i; j++) {
 					bomLine2 = (TCComponentBOMLine) arrayOfAIFComponentContext[j]
 							.getComponent();
-
-					TCComponentItemRevision itemRevision = null;
-					itemRevision = bomLine2.getItemRevision();
-					if (itemRevision != null) {
-						AIFComponentContext[] where = itemRevision
-								.whereReferenced();
-						AIFComponentContext[] arrayOfAIFComponentContext1;
-						int j1 = (arrayOfAIFComponentContext1 = where).length;
-						for (int i1 = 0; i1 < j1; i1++) {
-							AIFComponentContext cont = arrayOfAIFComponentContext1[i1];
-							if (cont.getComponent().toString().startsWith(
-									"TP_"
-											+ bomLine2.getItem().getProperty(
-													"current_id")))
-								localVector.addElement((TCComponent)cont.getComponent());
-
-						}
-					}
-
+					AddToClipboard(bomLine2.getItemRevision());
 					if (bomLine2.hasChildren()) {
 						if (!CheckNode(bomLine2))
 							return false;
@@ -96,7 +93,7 @@ public class MainHandler extends AbstractHandler {
 					"Teamcenter Error", MessageBox.ERROR);
 			return null;
 		}
-		
+
 		CheckNode(localTCComponentBOMLine);
 
 		if (!localVector.isEmpty()) {
@@ -104,7 +101,12 @@ public class MainHandler extends AbstractHandler {
 			AIFTransferable localAIFTransferable = new AIFTransferable(
 					localVector);
 			localAIFClipboard.setContents(localAIFTransferable, null);
-		}
+			MessageBox.post("В буфер обмена скопировано объектов ТП: "
+					+ Integer.toString(localVector.size()), "Teamcenter",
+					MessageBox.INFORMATION);
+		} else
+			MessageBox.post("объектов ТП в сборке не обнаружено", "Teamcenter",
+					MessageBox.INFORMATION);
 
 		return null;
 	}
